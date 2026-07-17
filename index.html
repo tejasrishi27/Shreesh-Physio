@@ -1,535 +1,440 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shreesh Physio Clinic | Clinical Evidence-Based Biomechanics</title>
-    <!-- Tailwind CSS Engine CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React Core CDN -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <!-- Babel Compiler for JSX Parsing -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        clinicalBlue: '#0066FF',
-                        clinicalGreen: '#10B981',
-                        clinicalDark: '#0F172A',
-                        clinicalSlate: '#475569',
-                    },
-                    animation: {
-                        fadeIn: 'fadeIn 0.2s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.98)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shreesh Physio Clinic - Evidence-Based Rehabilitation</title>
+    <!-- React and ReactDOM CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel CDN for JSX Parsing -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clinicalDark: '#0F172A',
+                        clinicalBlue: '#0284C7',
+                        clinicalGreen: '#10B981',
+                        clinicalSlate: '#64748B',
+                        clinicalLight: '#F0F9FF'
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(4px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-slate-50 text-clinicalDark antialiased min-h-screen">
-    <div id="root"></div>
+<body class="bg-[#F8FAFC] font-sans antialiased text-slate-800">
+    <div id="root"></div>
 
-    <script type="text/babel">
-        function App() {
-            // --- CORE CLINICAL REFERENCE ARRAYS ---
-            const specialties = [
-                { id: 'ortho', name: 'Orthopedic Rehabilitation', description: 'Post-fracture, joint replacements, skeletal correction.' },
-                { id: 'neuro', name: 'Neurological Calisthenics', description: 'Motor control restoration, stroke recovery, baseline motor neural path remapping.' },
-                { id: 'sports', name: 'Sports Biomechanics Recovery', description: 'Elite structural return-to-play training, soft-tissue strains, joint stabilizing.' },
-                { id: 'geriatric', name: 'Geriatric Independence', description: 'Degenerative joint disease mitigation, balance adjustments, posture calibration.' }
-            ];
+    <script type="text/babel">
+        function App() {
+            // Delivery Mode & Specializations State
+            const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState('In-Clinic');
+            const [selectedSpecialty, setSelectedSpecialty] = React.useState('');
+            const [selectedSlot, setSelectedSlot] = React.useState('');
+            const [bookingStep, setBookingStep] = React.useState(1);
+            
+            // Patient Fields State
+            const [patientName, setPatientName] = React.useState('');
+            const [patientPhone, setPatientPhone] = React.useState('');
+            const [patientEmail, setPatientEmail] = React.useState('');
 
-            const availableSlots = [
-                "10:00 AM - 11:30 AM",
-                "11:40 AM - 01:10 PM",
-                "03:00 PM - 04:30 PM",
-                "05:00 PM - 06:30 PM",
-                "07:00 PM - 08:30 PM"
-            ];
+            // Component Visibility State
+            const [activeFaq, setActiveFaq] = React.useState(null);
+            const [showPortalModal, setShowPortalModal] = React.useState(false);
+            const [showSuccessModal, setShowSuccessModal] = React.useState(false);
 
-            const testimonials = [
-                { name: "Rajesh Kumar", relation: "Chronic Lumbar Management Client", rating: 5, text: "The baseline architectural alignment exercises completely eliminated my 3-year sciatic neural track compression within 6 localized intake cycles." },
-                { name: "Ananya Reddy", relation: "ACL Post-Operative Rehabilitation", rating: 5, text: "Precision recovery routines targeted joint stabilization perfectly. Returning to physical sports 4 weeks ahead of initial timeline parameters." }
-            ];
+            // Portal Login Input State
+            const [portalEmail, setPortalEmail] = React.useState('');
+            const [portalPassword, setPortalPassword] = React.useState('');
+            const [portalError, setPortalError] = React.useState('');
 
-            const faqs = [
-                { q: "What should I arrange before a Home Care intake session?", a: "Ensure a minimum clear space corridor of 6x6 feet, maintain all baseline surgical discharge papers, and wear loose calisthenics-friendly clothing items." },
-                { q: "How long does a biomechanical assessment block take?", a: "The intake slot lasts exactly 90 minutes. This includes 30 minutes of diagnostic dynamic tracking metrics and 60 minutes of target physical execution." }
-            ];
+            // Hardcoded Clinical Data Arrays
+            const specialties = [
+                { id: 'ortho', title: 'Orthopedic Rehabilitation', description: 'Post-operative TKR/THR mobilization framework, chronic knee pathology, osteoarthritic care, and structural joint realignment strategies.', icon: '🦴' },
+                { id: 'neuro', title: 'Neurological Recovery', description: 'Targeted sensorimotor retraining paths, neuroplasticity acceleration for post-stroke hemiplegia, and balance system regulation.', icon: '🧠' },
+                { id: 'spine', title: 'Spinal Decompression Care', description: 'Advanced mechanical decompression, core muscular recalibration for disc herniation, sciatica, and chronic lumbar strain.', icon: '🧬' },
+                { id: 'sports', title: 'Sports Tissue Load Progression', description: 'Biomechanical optimization, progressive loading for kinetic ligament tears (ACL/MCL), rotator cuff repairs, and speed return protocols.', icon: '🏃‍♂️' }
+            ];
 
-            // --- REACT STRUCTURAL STATES ---
-            const [bookingStep, setBookingStep] = React.useState(1);
-            const [selectedSpecialty, setSelectedSpecialty] = React.useState(specialties[0].name);
-            const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState('Clinic Setup');
-            const [selectedSlot, setSelectedSlot] = React.useState(availableSlots[0]);
-            
-            // Patient Specific Profile Forms
-            const [patientName, setPatientName] = React.useState('');
-            const [patientPhone, setPatientPhone] = React.useState('');
-            const [patientEmail, setPatientEmail] = React.useState('');
-            const [homeAddress, setHomeAddress] = React.useState('');
-            
-            // Utility Interface States
-            const [activeFaq, setActiveFaq] = React.useState(null);
-            const [showPortalModal, setShowPortalModal] = React.useState(false);
-            const [showSuccessModal, setShowSuccessModal] = React.useState(false);
-            
-            // Secure Portal States
-            const [portalEmail, setPortalEmail] = React.useState('');
-            const [portalPassword, setPortalPassword] = React.useState('');
-            const [portalError, setPortalError] = React.useState('');
+            const timeSlots = [
+                '10:00 AM - 11:00 AM',
+                '11:00 AM - 12:00 PM',
+                '12:00 PM - 01:00 PM',
+                '06:00 PM - 07:00 PM',
+                '07:00 PM - 08:00 PM',
+                '08:00 PM - 09:00 PM'
+            ];
 
-            // --- INTERACTION ACTION CONTROLLERS ---
-            const handleIntakeSubmit = (e) => {
-                e.preventDefault();
-                if (!patientName || !patientPhone) return;
-                if (selectedDeliveryMode === 'Home Care' && !homeAddress) return;
-                
-                setShowSuccessModal(true);
-            };
+            const metrics = [
+                { val: '15,000+', label: 'Recovered Patients' },
+                { val: '98.6%', label: 'Clinical Efficacy Rate' },
+                { val: '12+ Yrs', label: 'Practicing Excellence' },
+                { val: '2026', label: 'Tech Upgraded Setup' }
+            ];
 
-            const handlePortalLogin = (e) => {
-                e.preventDefault();
-                if (portalEmail && portalPassword) {
-                    setPortalError('Access denied: Unauthorized access key configuration. Please clear parameters.');
-                }
-            };
+            const testimonials = [
+                { name: 'Rajesh Kumar', relation: 'Post-TKR Rehabilitation', rating: 5, text: 'The structural approach to my post-knee replacement therapy allowed full mobility return within 6 weeks. Exceptionally professional setup.' },
+                { name: 'Priyanka Reddy', relation: 'Chronic Lumbar Recovery', rating: 5, text: 'Suffered from severe disc bulge symptoms for 2 years. Their targeted core restoration plan resolved my radicular nerve pain completely.' },
+                { name: 'Anand Sharma', relation: 'Sports Injury Path', rating: 5, text: 'Recovered safely from an absolute Grade-II ankle sprain under their advanced progressive tissue load scheduling guidelines.' },
+                { name: 'Sunitha V.', relation: 'Neurological Balance Care', rating: 5, text: 'Excellent specialized stroke therapy path. The balance retraining strategies systematically restored independent gait confidence.' }
+            ];
 
-            const resetBooking = () => {
-                setPatientName('');
-                setPatientPhone('');
-                setPatientEmail('');
-                setHomeAddress('');
-                setBookingStep(1);
-                setShowSuccessModal(false);
-            };
+            const faqs = [
+                { q: 'What should I present at my baseline diagnostic evaluation?', a: 'Please ensure all relevant medical records, historical imaging metrics (MRI, X-Rays), and surgical referral summaries are provided during initial system intake.' },
+                { q: 'How are clinical sessions arranged across delivery paths?', a: 'Patients can choose either In-Clinic consultations utilizing specialized hardware infrastructure or scheduled Home Care visits for specific post-operative conditions.' },
+                { q: 'What is your standard cancellation policy structure?', a: 'Appointments can be modified or canceled up to 2 hours before your scheduled time window without incurring administrative adjustments.' }
+            ];
 
-            return (
-                <div className="flex flex-col min-h-screen">
-                    
-                    {/* 1. System Navigation Bar */}
-                    <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-4">
-                        <div className="max-w-7xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center space-x-2">
-                                <span className="text-clinicalBlue text-xl font-black tracking-tight">✦ Shreesh Physio</span>
-                            </div>
-                            <div className="hidden md:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-clinicalSlate">
-                                <a href="#specialties" className="hover:text-clinicalBlue transition">Specialties</a>
-                                <a href="#intake" className="hover:text-clinicalBlue transition">Intake Console</a>
-                                <a href="#testimonials" className="hover:text-clinicalBlue transition">Metrics</a>
-                                <a href="#faqs" className="hover:text-clinicalBlue transition">Diagnostics</a>
-                            </div>
-                            <div>
-                                <button 
-                                    onClick={() => setShowPortalModal(true)}
-                                    className="bg-clinicalDark text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition shadow-sm"
-                                >
-                                    Access Portal
-                                </button>
-                            </div>
-                        </div>
-                    </nav>
+            // Action Handlers
+            const handleBookingSubmit = (e) => {
+                e.preventDefault();
+                if (!patientName || !patientPhone) return;
+                setShowSuccessModal(true);
+            };
 
-                    {/* 2. Hero Presentation Engine */}
-                    <header className="bg-clinicalDark text-white py-20 lg:py-28 px-4 text-center space-y-6 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,102,255,0.12),transparent_50%)]"></div>
-                        <div className="max-w-3xl mx-auto space-y-6 relative z-10">
-                            <span className="inline-block bg-clinicalBlue/10 text-clinicalBlue border border-clinicalBlue/20 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
-                                Advanced Human Mechanics Recovery Infrastructure
-                            </span>
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.15]">
-                                Biomechanical Diagnostics & Evidence-Based Physical Adjustments
-                            </h1>
-                            <p className="text-sm md:text-base text-slate-400 max-w-xl mx-auto font-medium leading-relaxed">
-                                Scientific dynamic reconditioning, structured therapeutic tracking, and customized posture recovery tracks.
-                            </p>
-                            <div className="pt-4">
-                                <a href="#intake" className="bg-clinicalBlue text-white text-xs font-bold tracking-wider uppercase px-8 py-4 rounded-xl shadow-lg shadow-clinicalBlue/20 hover:bg-blue-600 transition inline-block">
-                                    Initiate Intake Profile Setup
-                                </a>
-                            </div>
-                        </div>
-                    </header>
+            const handlePortalLogin = (e) => {
+                e.preventDefault();
+                if (!portalEmail.includes('@') || portalPassword.length < 6) {
+                    setPortalError('Invalid identification parameter credentials.');
+                } else {
+                    setPortalError('');
+                    alert('Portal Access granted successfully.');
+                    setShowPortalModal(false);
+                }
+            };
 
-                    {/* 3. Clinical Metrics Band */}
-                    <section className="bg-white border-b border-gray-100 py-8 px-4">
-                        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                            <div><h3 className="text-2xl font-black text-clinicalBlue">100%</h3><p className="text-[10px] uppercase tracking-wider font-bold text-clinicalSlate mt-1">Evidence-Based Pathways</p></div>
-                            <div><h3 className="text-2xl font-black text-clinicalDark">20k+</h3><p className="text-[10px] uppercase tracking-wider font-bold text-clinicalSlate mt-1">Daily Activity Validation Steps</p></div>
-                            <div><h3 className="text-2xl font-black text-clinicalDark">1.5h</h3><p className="text-[10px] uppercase tracking-wider font-bold text-clinicalSlate mt-1">Dedicated Diagnostic Blocks</p></div>
-                            <div><h3 className="text-2xl font-black text-clinicalGreen">Active</h3><p className="text-[10px] uppercase tracking-wider font-bold text-clinicalSlate mt-1">Emergency Operations System</p></div>
-                        </div>
-                    </section>
+            const resetBooking = () => {
+                setBookingStep(1);
+                setSelectedSpecialty('');
+                setSelectedSlot('');
+                setPatientName('');
+                setPatientPhone('');
+                setPatientEmail('');
+                setShowSuccessModal(false);
+            };
 
-                    {/* 4. Functional Specialty Domains */}
-                    <section id="specialties" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
-                            <h2 className="text-2xl md:text-3xl font-extrabold text-clinicalDark">Targeted Rehabilitation Modalities</h2>
-                            <p className="text-xs text-clinicalSlate">Anatomical path restructuring configurations optimized for physical performance recovery.</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {specialties.map((spec) => (
-                                <div key={spec.id} className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
-                                    <div className="space-y-3">
-                                        <div className="w-10 h-10 bg-clinicalBlue/5 rounded-xl flex items-center justify-center text-clinicalBlue font-bold text-sm">✦</div>
-                                        <h3 className="text-sm font-bold text-clinicalDark">{spec.name}</h3>
-                                        <p className="text-xs text-clinicalSlate leading-relaxed">{spec.description}</p>
-                                    </div>
-                                    <div className="pt-4">
-                                        <a href="#intake" onClick={() => setSelectedSpecialty(spec.name)} className="text-[11px] font-bold text-clinicalBlue hover:underline flex items-center">
-                                            Select System Track &rarr;
-                                        </a>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+            return (
+                <div className="min-h-screen flex flex-col justify-between">
+                    
+                    {/* 1. Global Navigation Bar Header */}
+                    <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl font-black tracking-tight text-clinicalDark flex items-center">
+                                    <span className="text-clinicalBlue mr-1">✦</span>Shreesh Physio
+                                </span>
+                            </div>
+                            <div className="hidden md:flex items-center gap-8 text-xs font-bold text-clinicalSlate uppercase tracking-wider">
+                                <a href="#specialties" className="hover:text-clinicalBlue transition">Specialties</a>
+                                <a href="#booking" className="hover:text-clinicalBlue transition">Booking System</a>
+                                <a href="#testimonials" className="hover:text-clinicalBlue transition">Clinical Outcomes</a>
+                                <a href="#faqs" className="hover:text-clinicalBlue transition">Support Matrix</a>
+                            </div>
+                            <button 
+                                onClick={() => setShowPortalModal(true)}
+                                className="border border-clinicalDark text-clinicalDark hover:bg-clinicalDark hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                            >
+                                Patient Portal Login
+                            </button>
+                        </div>
+                    </nav>
 
-                    {/* 5. Scheduling & Patient Intake Engine */}
-                    <section id="intake" className="py-20 bg-slate-100 border-t border-gray-200/60 px-4 sm:px-6 lg:px-8">
-                        <div className="max-w-3xl mx-auto bg-white rounded-3xl border border-gray-200/60 shadow-xl overflow-hidden">
-                            
-                            {/* Intake Header Tracker */}
-                            <div className="bg-clinicalDark text-white p-6 sm:p-8 flex justify-between items-center">
-                                <div>
-                                    <h2 className="text-lg font-bold">Biomechanical Booking Matrix</h2>
-                                    <p className="text-slate-400 text-xs mt-0.5">Configure operational metrics and baseline profile criteria.</p>
-                                </div>
-                                <span className="bg-clinicalBlue text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-md">
-                                    Step {bookingStep} of 2
-                                </span>
-                            </div>
+                    {/* 2. Hero Presentation Section */}
+                    <section className="bg-gradient-to-b from-clinicalLight via-white to-[#F8FAFC] py-20 px-4 border-b border-gray-50">
+                        <div className="max-w-5xl mx-auto text-center space-y-6">
+                            <span className="inline-block text-xs font-bold tracking-widest text-clinicalBlue bg-clinicalBlue/10 px-4 py-1.5 rounded-full uppercase">
+                                Advanced Physiotherapeutic Infrastructure
+                            </span>
+                            <h1 className="text-4xl md:text-6xl font-black text-clinicalDark tracking-tight max-w-4xl mx-auto leading-[1.1]">
+                                Science-Backed Physical Rehabilitation & Recovery
+                            </h1>
+                            <p className="text-sm md:text-base text-clinicalSlate max-w-2xl mx-auto leading-relaxed">
+                                Personalized anatomical evaluation matrix configured with clinical exercise prescription paths to effectively overcome chronic pain, physical injury, and surgical recovery restrictions.
+                            </p>
+                            <div className="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                                <a href="#booking" className="w-full sm:w-auto bg-clinicalBlue text-white font-bold text-sm px-8 py-4 rounded-2xl shadow-lg shadow-clinicalBlue/20 hover:bg-clinicalBlue/90 transition text-center">
+                                    Schedule Immediate Clinical Intake
+                                </a>
+                                <a href="#specialties" className="w-full sm:w-auto bg-white border border-gray-200 text-clinicalDark font-bold text-sm px-8 py-4 rounded-2xl hover:border-gray-300 transition text-center">
+                                    Review Diagnostic Specializations
+                                </a>
+                            </div>
+                        </div>
+                    </section>
 
-                            {/* Intake Form Entry */}
-                            <div className="p-6 sm:p-8">
-                                <form onSubmit={handleIntakeSubmit}>
-                                    
-                                    {/* STEP 1: PARAMETER SETUP */}
-                                    {bookingStep === 1 && (
-                                        <div className="space-y-6 animate-fadeIn">
-                                            
-                                            {/* Specialty Picker */}
-                                            <div>
-                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-2">Rehab Track Modality</label>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                    {specialties.map((s) => (
-                                                        <button
-                                                            key={s.id} type="button"
-                                                            onClick={() => setSelectedSpecialty(s.name)}
-                                                            className={`text-left p-3 rounded-xl border text-xs font-medium transition ${selectedSpecialty === s.name ? 'border-clinicalBlue bg-clinicalBlue/5 text-clinicalBlue shadow-sm' : 'border-gray-200 text-clinicalDark hover:bg-gray-50'}`}
-                                                        >
-                                                            {s.name}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
+                    {/* 3. Operational Performance Indicators */}
+                    <section className="py-12 bg-white border-b border-gray-100">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                                {metrics.map((m, idx) => (
+                                    <div key={idx} className="p-6 text-center bg-[#F8FAFC] rounded-2xl border border-gray-50">
+                                        <div className="text-2xl md:text-3xl font-black text-clinicalDark">{m.val}</div>
+                                        <div className="text-[11px] font-bold text-clinicalSlate uppercase tracking-wider mt-1">{m.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
 
-                                            {/* Delivery Mode Setup */}
-                                            <div>
-                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-2">Operational Infrastructure Mode</label>
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    {['Clinic Setup', 'Home Care'].map((mode) => (
-                                                        <button
-                                                            key={mode} type="button"
-                                                            onClick={() => setSelectedDeliveryMode(mode)}
-                                                            className={`p-3 rounded-xl border text-xs font-bold text-center transition ${selectedDeliveryMode === mode ? 'border-clinicalBlue bg-clinicalBlue/5 text-clinicalBlue' : 'border-gray-200 text-clinicalDark hover:bg-gray-50'}`}
-                                                        >
-                                                            {mode === 'Clinic Setup' ? '🏛 Clinic Infrastructure' : '🏡 Home Deployment'}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
+                    {/* 4. Modality Selection & Medical Specialties Grid */}
+                    <section id="specialties" className="py-20 bg-[#F8FAFC]">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                                <h2 className="text-2xl md:text-3xl font-extrabold text-clinicalDark">Configured Treatment Tracks</h2>
+                                <p className="text-xs text-clinicalSlate">Select your delivery strategy environment preferences below.</p>
+                                
+                                {/* Delivery Mode Switcher */}
+                                <div className="inline-flex p-1 bg-white border border-gray-200 rounded-xl mt-4">
+                                    {['In-Clinic', 'Home Care'].map((mode) => (
+                                        <button
+                                            key={mode}
+                                            onClick={() => setSelectedDeliveryMode(mode)}
+                                            className={`px-6 py-2 rounded-lg text-xs font-bold transition ${selectedDeliveryMode === mode ? 'bg-clinicalDark text-white shadow-sm' : 'text-clinicalSlate hover:text-clinicalDark'}`}
+                                        >
+                                            {mode} Environment
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
 
-                                            {/* Slot Time Picker */}
-                                            <div>
-                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-2">Temporal Diagnostics Allocation</label>
-                                                <select 
-                                                    value={selectedSlot}
-                                                    onChange={(e) => setSelectedSlot(e.target.value)}
-                                                    className="w-full text-xs font-medium border border-gray-200 rounded-xl p-3 bg-white focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
-                                                >
-                                                    {availableSlots.map((slot, idx) => (
-                                                        <option key={idx} value={slot}>{slot}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {specialties.map((spec) => (
+                                    <div key={spec.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex gap-4 items-start transition hover:shadow-md">
+                                        <div className="w-12 h-12 rounded-xl bg-clinicalLight flex items-center justify-center text-xl flex-shrink-0">
+                                            {spec.icon}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <h3 className="text-base font-bold text-clinicalDark">{spec.title}</h3>
+                                            <p className="text-xs text-clinicalSlate leading-relaxed">{spec.description}</p>
+                                            <a href="#booking" onClick={() => setSelectedSpecialty(spec.title)} className="inline-block text-[11px] font-bold text-clinicalBlue hover:underline pt-2">
+                                                Initialize this path &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
 
-                                            {/* Step Proceed Navigation */}
-                                            <div className="pt-4 border-t border-gray-100 flex justify-end">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setBookingStep(2)}
-                                                    className="w-full sm:w-auto bg-clinicalBlue text-white text-xs font-bold tracking-wider uppercase px-6 py-3.5 rounded-xl shadow-md shadow-clinicalBlue/10 hover:bg-blue-600 transition"
-                                                >
-                                                    Proceed to Patient Profile &rarr;
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
+                    {/* 5. Interactive Patient Booking Engine */}
+                    <section id="booking" className="py-20 bg-white">
+                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+                                
+                                {/* Header / Steps Progress */}
+                                <div className="bg-clinicalDark text-white p-6 md:p-8">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h3 className="text-xl font-bold">Clinical Appointment Booking</h3>
+                                            <p className="text-xs text-blue-200 mt-1">Direct scheduling under evidence-based assessment paths.</p>
+                                        </div>
+                                        <span className="bg-clinicalBlue text-white text-xs font-bold px-3 py-1 rounded-full">
+                                            Step {bookingStep} of 2
+                                        </span>
+                                    </div>
+                                    
+                                    {/* Progress Bar Indicator */}
+                                    <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                        <div 
+                                            className="bg-clinicalGreen h-full transition-all duration-300" 
+                                            style={{ width: bookingStep === 1 ? '50%' : '100%' }}
+                                        />
+                                    </div>
+                                </div>
 
-                                    {/* STEP 2: PATIENT DETAIL FORMS */}
-                                    {bookingStep === 2 && (
-                                        <div className="space-y-5 animate-fadeIn">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
-                                                        Legal Full Name <span className="text-red-500">*</span>
-                                                    </label>
-                                                    <input 
-                                                        type="text" 
-                                                        required
-                                                        placeholder="e.g., John Doe" 
-                                                        value={patientName}
-                                                        onChange={(e) => setPatientName(e.target.value)}
-                                                        className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
-                                                        Phone Matrix Parameter <span className="text-red-500">*</span>
-                                                    </label>
-                                                    <input 
-                                                        type="tel" 
-                                                        required
-                                                        placeholder="e.g., +91 98765 43210" 
-                                                        value={patientPhone}
-                                                        onChange={(e) => setPatientPhone(e.target.value)}
-                                                        className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
-                                                    />
-                                                </div>
-                                            </div>
+                                {/* Form Container */}
+                                <form onSubmit={handleBookingSubmit} className="p-6 md:p-8">
+                                    
+                                    {/* STEP 1: Specialization & Scheduling */}
+                                    {bookingStep === 1 && (
+                                        <div className="space-y-6 animate-fadeIn">
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-2">
+                                                    1. Select Pathology / Specialty <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    {specialties.map((spec) => (
+                                                        <div 
+                                                            key={spec.id}
+                                                            onClick={() => setSelectedSpecialty(spec.title)}
+                                                            className={`p-4 rounded-xl border text-left cursor-pointer transition flex items-start gap-3 ${selectedSpecialty === spec.title ? 'border-clinicalBlue bg-clinicalLight/50 ring-2 ring-clinicalBlue/20' : 'border-gray-200 hover:border-gray-300'}`}
+                                                        >
+                                                            <div className="mt-0.5 text-clinicalBlue flex-shrink-0">{spec.icon}</div>
+                                                            <div>
+                                                                <h4 className="text-sm font-bold text-clinicalDark">{spec.title}</h4>
+                                                                <p className="text-[11px] text-clinicalSlate mt-0.5 line-clamp-2">{spec.description}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
 
-                                            <div>
-                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
-                                                    Email Address
-                                                </label>
-                                                <input 
-                                                    type="email" 
-                                                    placeholder="name@example.com" 
-                                                    value={patientEmail}
-                                                    onChange={(e) => setPatientEmail(e.target.value)}
-                                                    className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
-                                                />
-                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-2">
+                                                    2. Select Available Hourly Slot <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                                    {timeSlots.map((slot) => (
+                                                        <button
+                                                            key={slot}
+                                                            type="button"
+                                                            onClick={() => setSelectedSlot(slot)}
+                                                            className={`p-3 rounded-lg border text-xs font-semibold text-center transition ${selectedSlot === slot ? 'bg-clinicalBlue border-clinicalBlue text-white shadow-sm' : 'border-gray-200 text-clinicalDark hover:bg-gray-50'}`}
+                                                        >
+                                                            {slot}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
 
-                                            {selectedDeliveryMode === 'Home Care' && (
-                                                <div className="animate-fadeIn">
-                                                    <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
-                                                        Geographical Home Address <span className="text-red-500">*</span>
-                                                    </label>
-                                                    <textarea 
-                                                        required
-                                                        rows="3"
-                                                        placeholder="Enter complete residential coordinates for baseline home deployment..." 
-                                                        value={homeAddress}
-                                                        onChange={(e) => setHomeAddress(e.target.value)}
-                                                        className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition resize-none"
-                                                    />
-                                                </div>
-                                            )}
+                                            <div className="pt-4 border-t border-gray-100 flex justify-end">
+                                                <button
+                                                    type="button"
+                                                    disabled={!selectedSpecialty || !selectedSlot}
+                                                    onClick={() => setBookingStep(2)}
+                                                    className="w-full sm:w-auto bg-clinicalBlue text-white disabled:opacity-50 text-sm font-bold px-6 py-3 rounded-xl shadow transition min-h-[48px]"
+                                                >
+                                                    Continue to Patient Details &rarr;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
 
-                                            <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3 justify-between">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setBookingStep(1)}
-                                                    className="w-full sm:w-auto border border-gray-200 text-clinicalDark text-sm font-bold px-6 py-3 rounded-xl hover:bg-gray-50 transition min-h-[48px]"
-                                                >
-                                                    &larr; Adjust Slot Parameters
-                                                </button>
-                                                <button
-                                                    type="submit"
-                                                    className="w-full sm:w-auto bg-clinicalGreen text-white text-sm font-bold px-8 py-3 rounded-xl shadow-lg shadow-clinicalGreen/15 hover:bg-clinicalGreen/90 transition min-h-[48px]"
-                                                >
-                                                    Confirm Intake Profile
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </form>
-                            </div>
-                        </div>
-                    </section>
+                                    {/* STEP 2: Patient Personal Validation Information */}
+                                    {bookingStep === 2 && (
+                                        <div className="space-y-6 animate-fadeIn">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
+                                                        Full Patient Name <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <input 
+                                                        type="text" 
+                                                        required
+                                                        placeholder="e.g., Siripuram Rakesh" 
+                                                        value={patientName}
+                                                        onChange={(e) => setPatientName(e.target.value)}
+                                                        className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
+                                                        Contact Number <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <input 
+                                                        type="tel" 
+                                                        required
+                                                        placeholder="10-digit mobile number" 
+                                                        value={patientPhone}
+                                                        onChange={(e) => setPatientPhone(e.target.value)}
+                                                        className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
+                                                    />
+                                                </div>
+                                            </div>
 
-                    {/* 6. Clinical Outcomes & Testimonials Matrix */}
-                    <section id="testimonials" className="py-20 bg-[#F8FAFC] border-t border-b border-gray-100">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
-                                <h2 className="text-2xl md:text-3xl font-extrabold text-clinicalDark">Verified Functional Recovery Track Records</h2>
-                                <p className="text-xs text-clinicalSlate">Anatomical calibration feedback from documented client paths.</p>
-                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase tracking-wider text-clinicalDark mb-1.5">
+                                                    Email Address <span className="text-clinicalSlate">(Optional)</span>
+                                                </label>
+                                                <input 
+                                                    type="email" 
+                                                    placeholder="patient@example.com" 
+                                                    value={patientEmail}
+                                                    onChange={(e) => setPatientEmail(e.target.value)}
+                                                    className="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-clinicalBlue focus:ring-2 focus:ring-clinicalBlue/10 transition"
+                                                />
+                                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {testimonials.map((t, idx) => (
-                                    <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h4 className="text-sm font-bold text-clinicalDark">{t.name}</h4>
-                                                <span className="text-[11px] font-medium text-clinicalBlue bg-clinicalBlue/5 px-2 py-0.5 rounded mt-1 inline-block">
-                                                    {t.relation}
-                                                </span>
-                                            </div>
-                                            <div className="text-amber-400 text-xs">
-                                                {'★'.repeat(t.rating)}
-                                            </div>
-                                        </div>
-                                        <p className="text-xs text-clinicalSlate italic leading-relaxed">
-                                            "{t.text}"
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
+                                            {/* Treatment Selection Summary Review Card */}
+                                            <div className="bg-clinicalLight border border-blue-100 rounded-2xl p-4 text-xs space-y-2">
+                                                <h4 className="font-bold text-clinicalDark text-sm mb-1">Appointment Summary Review</h4>
+                                                <div className="flex justify-between"><span className="text-clinicalSlate">Selected Care Modality:</span> <strong className="text-clinicalDark">{selectedDeliveryMode} Care</strong></div>
+                                                <div className="flex justify-between"><span className="text-clinicalSlate">Clinical Specialty Focus:</span> <strong className="text-clinicalDark">{selectedSpecialty}</strong></div>
+                                                <div className="flex justify-between"><span className="text-clinicalSlate">Allocated Timeframe:</span> <strong className="text-clinicalBlue">{selectedSlot}</strong></div>
+                                            </div>
 
-                    {/* 7. Structured Support Matrix FAQ */}
-                    <section id="faqs" className="py-20 bg-white">
-                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
-                                <h2 className="text-2xl md:text-3xl font-extrabold text-clinicalDark">System Diagnostics & Guidelines</h2>
-                                <p className="text-xs text-clinicalSlate">Answers regarding clinical infrastructure and baseline procedures.</p>
-                            </div>
+                                            <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setBookingStep(1)}
+                                                    className="w-full sm:w-auto text-xs font-bold text-[#475569] hover:text-clinicalDark p-2 text-center"
+                                                >
+                                                    &larr; Adjust Slot Preferences
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="w-full sm:w-auto bg-[#10B981] text-white font-bold text-sm px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition min-h-[48px]"
+                                                >
+                                                    Confirm and Book Session
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
 
-                            <div className="space-y-4">
-                                {faqs.map((faq, idx) => (
-                                    <div key={idx} className="border border-gray-100 rounded-xl overflow-hidden">
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                                            className="w-full bg-[#F8FAFC] px-6 py-4 text-left flex justify-between items-center transition hover:bg-gray-50"
-                                        >
-                                            <span className="text-sm font-bold text-clinicalDark">{faq.q}</span>
-                                            <span className="text-clinicalBlue text-xs font-bold">
-                                                {activeFaq === idx ? '−' : '+'}
-                                            </span>
-                                        </button>
-                                        {activeFaq === idx && (
-                                            <div className="px-6 py-4 bg-white text-xs text-clinicalSlate leading-relaxed border-t border-gray-50 animate-fadeIn">
-                                                {faq.a}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
 
-                    {/* 8. Global Utility Footer */}
-                    <footer className="bg-clinicalDark text-white py-12 px-4 border-t border-white/5">
-                        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                            <div className="space-y-3">
-                                <span className="text-base font-black tracking-tight flex items-center justify-center md:justify-start">
-                                    <span className="text-clinicalBlue mr-1">✦</span>Shreesh Physio
-                                </span>
-                                <p className="text-slate-400 text-[11px] max-w-xs mx-auto md:mx-0 leading-relaxed">
-                                    Engineered architectural biomechanical adjustments to restore human movement efficiency safely.
-                                </p>
-                            </div>
-                            <div className="space-y-2 text-xs text-slate-400">
-                                <h4 className="font-bold text-white uppercase tracking-wider text-[11px]">System Locations</h4>
-                                <p>Main Clinical Setup: Hyderabad Metropolitan Core</p>
-                                <p>Residential Support Division: Hostel Infrastructure, Basar Region</p>
-                            </div>
-                            <div className="space-y-2 text-xs text-slate-400">
-                                <h4 className="font-bold text-white uppercase tracking-wider text-[11px]">Operational Timing</h4>
-                                <p>Mon - Sat: 10:00 AM - 09:00 PM</p>
-                                <p className="text-clinicalGreen font-medium">Emergency Post-Op Lines Available 24/7</p>
-                            </div>
-                        </div>
-                        <div className="max-w-7xl mx-auto border-t border-white/10 mt-8 pt-6 text-center text-[11px] text-slate-500">
-                            &copy; {new Date().getFullYear()} Shreesh Physio Clinic. All system metrics reserved.
-                        </div>
-                    </footer>
+                    {/* 6. Patient Feedback / Testimonials */}
+                    <section id="testimonials" className="py-20 bg-[#F8FAFC] border-y border-gray-100">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center max-w-2xl mx-auto mb-16">
+                                <span className="text-xs font-bold text-clinicalBlue uppercase tracking-wider bg-clinicalLight px-3.5 py-1.5 rounded-full">Patient Outcomes</span>
+                                <h2 className="text-3xl font-extrabold text-clinicalDark mt-4">Verified Recoveries</h2>
+                            </div>
 
-                    {/* MODAL 1: Patient Portal Authorization Screen */}
-                    {showPortalModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-clinicalDark/60 backdrop-blur-sm animate-fadeIn">
-                            <div className="bg-white rounded-2xl border border-gray-100 max-w-md w-full p-6 space-y-4 shadow-2xl">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-base font-bold text-clinicalDark">Portal Verification</h3>
-                                    <button 
-                                        onClick={() => { setShowPortalModal(false); setPortalError(''); }}
-                                        className="text-clinicalSlate hover:text-clinicalDark text-sm font-bold p-1"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                                <form onSubmit={handlePortalLogin} className="space-y-3">
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-clinicalDark uppercase tracking-wider mb-1">ID Parameter / Email</label>
-                                        <input 
-                                            type="email" 
-                                            required
-                                            value={portalEmail}
-                                            onChange={(e) => setPortalEmail(e.target.value)}
-                                            className="w-full text-xs border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-clinicalBlue"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-clinicalDark uppercase tracking-wider mb-1">Secure Passphrase</label>
-                                        <input 
-                                            type="password" 
-                                            required
-                                            value={portalPassword}
-                                            onChange={(e) => setPortalPassword(e.target.value)}
-                                            className="w-full text-xs border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-clinicalBlue"
-                                        />
-                                    </div>
-                                    {portalError && (
-                                        <p className="text-[11px] font-semibold text-red-500">{portalError}</p>
-                                    )}
-                                    <button 
-                                        type="submit" 
-                                        className="w-full bg-clinicalDark text-white font-bold text-xs py-2.5 rounded-xl hover:bg-slate-800 transition"
-                                    >
-                                        Authorize Security Clearance
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {testimonials.map((t, idx) => (
+                                    <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex text-yellow-400 mb-3">
+                                                {[...Array(t.rating)].map((_, i) => (
+                                                    <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                                ))}
+                                            </div>
+                                            <p className="text-xs md:text-sm text-clinicalDark leading-relaxed italic">"{t.text}"</p>
+                                        </div>
+                                        <div className="mt-4 pt-4 border-t border-gray-50">
+                                            <h4 className="text-xs font-bold text-clinicalDark">{t.name}</h4>
+                                            <span className="text-[10px] text-clinicalSlate font-medium">{t.relation}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
 
-                    {/* MODAL 2: Intake Submission Success Notification */}
-                    {showSuccessModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-clinicalDark/60 backdrop-blur-sm animate-fadeIn">
-                            <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-gray-50">
-                                <div className="w-12 h-12 bg-clinicalGreen/10 text-clinicalGreen rounded-full flex items-center justify-center text-xl mx-auto">
-                                    ✓
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-base font-bold text-clinicalDark">Clinical Intake Documented</h3>
-                                    <p className="text-xs text-clinicalSlate leading-relaxed">
-                                        Your session has been assigned to the <strong className="text-clinicalBlue">{selectedSpecialty}</strong> track at <strong>{selectedSlot}</strong> via <strong>{selectedDeliveryMode}</strong> mode.
-                                    </p>
-                                </div>
-                                <button 
-                                    onClick={resetBooking}
-                                    className="w-full bg-clinicalBlue text-white font-bold text-xs py-2.5 rounded-xl hover:bg-clinicalBlue/90 transition shadow-md shadow-clinicalBlue/10"
-                                >
-                                    Return to Control Console
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                    {/* 7. Clinical Support FAQs */}
+                    <section id="faqs" className="py-20 bg-white">
+                        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-12">
+                                <h2 className="text-2xl md:text-3xl font-extrabold text-clinicalDark">Frequently Asked Questions</h2>
+                                <p className="text-xs text-clinicalSlate mt-1">Key parameters regarding session rules and standard operational frameworks.</p>
+                            </div>
 
-                </div>
-            );
-        }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+                            <div className="space-y-3">
+                                {faqs.map((faq, idx) => (
+                                    <div key={idx} className="border border-gray-100 rounded-xl overflow-hidden bg-[#F8FAFC]">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+                                            className="w-full p-4 text-left font-semibold text-sm text-clinicalDark flex justify-between items-center hover:bg-gray-50 transition"
+                                        >
+                                            <span>{faq.q}</span>
+                   
